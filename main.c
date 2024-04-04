@@ -3,11 +3,42 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
+#include <errno.h>
+#include <stdlib.h>
+
 
 void clearInputBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
+
+void execute_command(char *command, char *args[]) {
+    if (strcmp(args[0], "cd") == 0) {
+        if (args[1] == NULL) {
+            fprintf(stderr, "cd: missing argument\n");
+        } else {
+            if (chdir(args[1]) != 0) {
+                perror("cd");
+            }
+        }
+        return;
+    }
+
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+        execvp(command, args);
+        perror("execvp");
+        exit(EXIT_FAILURE);
+    } else {
+        int status;
+        waitpid(pid, &status, 0);
+    }
+}
+
+
 
 int main ()
 {
@@ -46,13 +77,35 @@ int main ()
                 commands[comm_count]=strdup(command);
                 comm_count++;
                 pos += strlen(command) + 1; 
-                while (str[pos] == '|') pos++; 
+                while (str[pos] == '|') pos++;
+                
             }
             
-            /*printf("%d\n", comm_count);
+            for (int i=0;i<comm_count;i++){
+                char *token = strtok(commands[i], " ");
+                if (token == NULL) {
+                    continue; // Empty line
+                }
+
+                char *commando = token;
+                char *args[100];
+                args[0] = commando;
+
+                int i = 1;
+                while ((token = strtok(NULL, " ")) != NULL && i < 100) {
+                    args[i++] = token;
+                }
+                args[i] = NULL;
+                execute_command(commando, args); 
+            }
+
+
+            /*
+            printf("%d\n", comm_count);
             for (int i = 0; i < comm_count; i++) {
                 printf("%s\n", commands[i]);
-            }*/
+            }
+            */
         }
         
         /* This is the parent process. */
