@@ -4,3 +4,44 @@ a b
 c d
 a b c d
 b c d e a
+
+
+FILE *file;
+    char filename[] = ".myBash_history.txt";
+    char buffer[10100]; 
+
+    file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Error opening file %s\n", filename);
+        return;
+    }
+
+    fgets(buffer, sizeof(buffer), file);
+    printf("Content read from file: %s\n", buffer);
+
+  
+    fclose(file);
+
+    char *firstEnter;
+
+    firstEnter = strchr(buffer, '\n');
+    char substring[10100];
+    if (firstEnter != NULL) {
+        
+        strcpy(substring, firstEnter+1);
+        
+        printf("Substring after first newline character: %s\n", substring);
+    } else {
+        printf("No newline character found in the string.\n");
+    }
+
+    strcat(substring, command);
+
+    file = fopen(filename, "w");
+    if (file == NULL) {
+        printf("Error opening file %s\n", filename);
+        return;
+    }
+
+    fprintf(file,"%s\n", substring);
+    fclose(file);

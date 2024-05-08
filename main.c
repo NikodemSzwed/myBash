@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <ctype.h>
+#include <signal.h>
 
 void clearInputBuffer() {
     int c;
@@ -35,54 +36,68 @@ char *trim(char *s)
 }
 
 void history(char *command){
-    FILE *file;
-    char filename[] = ".myBash_history.txt";
-    char buffer[10100]; 
-
-    file = fopen(filename, "r");
+    FILE *file = fopen(".myBash_history.txt", "r+");
     if (file == NULL) {
-        printf("Error opening file %s\n", filename);
+        perror("Error opening history file");
         return;
     }
 
-    fgets(buffer, sizeof(buffer), file);
-    printf("Content read from file: %s\n", buffer);
-
-  
-    fclose(file);
-
-    char *firstEnter;
-
-    firstEnter = strchr(buffer, '\n');
-    char substring[10100];
-    if (firstEnter != NULL) {
-        
-        strcpy(substring, firstEnter+1);
-        
-        printf("Substring after first newline character: %s\n", substring);
-    } else {
-        printf("No newline character found in the string.\n");
+    char history[20][1000];
+    int lineCount = 0;
+    while (fgets(history[lineCount], 1000, file) != NULL && lineCount < 20) {
+        lineCount++;
     }
 
-    strcat(substring, command);
-
-    file = fopen(filename, "w");
-    if (file == NULL) {
-        printf("Error opening file %s\n", filename);
+    if (lineCount == 20) {
+        
+        fclose(file);
+        FILE *file = fopen(".myBash_history.txt", "w+");
+        if (file == NULL) {
+            perror("Error opening history file");
         return;
     }
+        
+        for (int i=0;i<19;i++){
+            fprintf(file, "%s", history[i+1]);
+        }
 
-    fprintf(file,"%s\n", substring);
+    }
+
+    
+    fprintf(file, "%s\n", command);
     fclose(file);
-
-
 }
+
+void handle_sigquit(int sig) {
+    printf("\nHistory:\n");
+
+    FILE *file = fopen(".myBash_history.txt", "r");
+    if (file == NULL) {
+        printf("Error opening history file.\n");
+        exit(1);
+    }
+
+    
+    char line[1000]; 
+    while (fgets(line, sizeof(line), file) != NULL) {
+        printf("%s", line);
+    }
+
+
+    fclose(file);
+
+    exit(0);
+}
+
 
 int main (int argc, char *argv[])
 {
     // FILE *file;
     int file;
     int script = 0;
+
+    signal(SIGQUIT, handle_sigquit);
+
     if (argc==2)
     {
         script = 1;
@@ -168,7 +183,7 @@ int main (int argc, char *argv[])
         // }
 
         
-        //history(str);
+        history(str);
         
         while (pos<strlen(str) && sscanf(str + pos, "%[^|]", command) == 1 && comm_count < 100) {
             commands[comm_count]=strdup(command);
