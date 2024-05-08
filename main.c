@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 
         help = scanf("%999[^\n]", str);
 
-        int status;
+        int status = 0;
         if (pid > 0)
             waitpid(pid, &status, WNOHANG);
         if (status && !script)
