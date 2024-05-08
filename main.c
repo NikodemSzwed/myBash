@@ -92,7 +92,6 @@ void handle_sigquit(int sig) {
 
 int main (int argc, char *argv[])
 {
-    // FILE *file;
     int file;
     int script = 0;
 
@@ -101,16 +100,7 @@ int main (int argc, char *argv[])
     if (argc==2)
     {
         script = 1;
-        /*file = fopen(argv[1], "r");
-        if (file == NULL) {
-            printf("Error opening file %s\n", argv[1]);
-            exit(EXIT_FAILURE);
-        }
-        char buffer[1000];
-        fscanf(file, "%s", buffer);
-        getc();*/
-        // fscanf(file,"%999[^\n]",buffer);
-
+        
         file = open(argv[1],O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
         if (file == -1) {
             perror("open");
@@ -152,7 +142,6 @@ int main (int argc, char *argv[])
             }
             clearInputBuffer();
             if(help!=1) continue;
-        // }
 
         
         history(str);
