@@ -46,8 +46,7 @@ void history(char *command)
     FILE *file = fopen(".myBash_history.txt", "r+");
     if (file == NULL)
     {
-        perror("Error opening history file");
-        return;
+        file = fopen(".myBash_history.txt", "w+");
     }
 
     char history[20][1000];
@@ -59,7 +58,6 @@ void history(char *command)
 
     if (lineCount == 20)
     {
-
         fclose(file);
         FILE *file = fopen(".myBash_history.txt", "w+");
         if (file == NULL)
@@ -85,14 +83,14 @@ void handle_sigquit(int sig)
     FILE *file = fopen(".myBash_history.txt", "r");
     if (file == NULL)
     {
-        printf("Error opening history file.\n");
-        exit(1);
+        file = fopen(".myBash_history.txt", "w+");
     }
 
     char line[1000];
+    int num = 0;
     while (fgets(line, sizeof(line), file) != NULL)
     {
-        printf("%s", line);
+        printf("%d: %s", ++num, line);
     }
 
     fclose(file);
@@ -110,9 +108,10 @@ int main(int argc, char *argv[])
     if (argc == 2)
     {
         script = 1;
-        
-        file = open(argv[1],O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-        if (file == -1) {
+
+        file = open(argv[1], O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+        if (file == -1)
+        {
             perror("open");
             exit(EXIT_FAILURE);
         }
@@ -137,7 +136,8 @@ int main(int argc, char *argv[])
         }
 
         int help = 0;
-        printf("> ");
+        if (!script)
+            printf("> ");
 
         if (script && firstLine)
         {
@@ -146,21 +146,21 @@ int main(int argc, char *argv[])
         }
 
         help = scanf("%999[^\n]", str);
-        
+
         int status;
-        if(pid>0)waitpid(pid, &status, WNOHANG);
-        if(status)printf("\n> ");
-            
-        // printf("%s\n", str);
+        if (pid > 0)
+            waitpid(pid, &status, WNOHANG);
+        if (status && !script)
+            printf("\n> ");
 
         if (help == EOF && script)
         {
             exit(EXIT_SUCCESS);
         }
+
         clearInputBuffer();
         if (help != 1)
             continue;
-        // }
 
         history(str);
 
@@ -263,6 +263,8 @@ int main(int argc, char *argv[])
                     dup2(file_fd, STDOUT_FILENO);
                 }
 
+                int success = 1;
+
                 if (i == 0)
                 { // First child process
                     if (i != comm_count - 1)
@@ -280,7 +282,7 @@ int main(int argc, char *argv[])
                         }
                     }
 
-                    execvp(commando, args);
+                    success = execvp(commando, args);
                 }
                 else if (i == comm_count - 1)
                 { // Last child process
@@ -296,7 +298,7 @@ int main(int argc, char *argv[])
                         close(pipes[j][1]);
                     }
 
-                    execvp(commando, args);
+                    success = execvp(commando, args);
                 }
                 else
                 { // Intermediate child processes
@@ -321,7 +323,12 @@ int main(int argc, char *argv[])
                         }
                     }
 
-                    execvp(commando, args);
+                    success = execvp(commando, args);
+                }
+                if (success == -1)
+                {
+                    fprintf(stderr, "%d: %s: command not found\n", i + 1, commando);
+                    // exit(EXIT_FAILURE);
                 }
                 exit(EXIT_SUCCESS);
             }

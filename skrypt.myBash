@@ -1,3 +1,6 @@
 #!/opt/lampp/htdocs/projects/myBash/main
 ls | grep o >> asd
 ls >> asd2
+sleep 7
+rm asd asd2
+
