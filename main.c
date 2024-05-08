@@ -136,35 +136,7 @@ int main (int argc, char *argv[])
         int help = 0;
         printf("> ");
 
-        /*if(script){
-            /*while (fscanf(file, "%s", str) == 1) {
-                printf("%s\n", str); // Print the value read from the file
-            }*/
-            //fscanf(file,"%999[^\n]",str);
-            //printf("1>%s\n", str);
-            // if(fscanf(file, "%999[^\r]", str) != 1) exit(EXIT_SUCCESS);
 
-            // printf("2>%s\n", str);//*/
-            //if(feof(file)) exit(EXIT_SUCCESS);
-            /*char *line;
-            size_t bufsize = 0;
-
-            // Read a line from the file
-            if (getline(&line, &bufsize, file) == -1) {
-                fprintf(stderr, "Error reading input\n");
-                exit(EXIT_FAILURE);
-            }
-            
-
-            printf("%s\n", str);
-            clearInputBuffer();*/
-            // Remove newline character, if present
-            /*char *newline = strchr(line, '\n');
-            if (newline != NULL) {
-                *newline = '\0';
-            }*/
-        /*} 
-        else {*/
             if (script&&firstLine)
             {
                 help = scanf("%999[^\n]",str);
