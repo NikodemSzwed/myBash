@@ -1,4 +1,4 @@
-#!/home/student/myBash/myBash
+#!/home/student/myBash
 ls | grep o >> asd
 ls >> asd2
 sleep 7
