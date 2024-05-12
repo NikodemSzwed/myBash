@@ -1,6 +1,9 @@
-#!/opt/lampp/htdocs/projects/myBash/main
+#!/home/marbur/Documents/Notatki/SO/bash/myBash/main
 ls | grep o >> asd
 ls >> asd2
+sdgsdg
+sdggfsdg
+sdg
 sleep 7
 rm asd asd2
 

@@ -102,6 +102,7 @@ int main(int argc, char *argv[])
 {
     int file;
     int script = 0;
+    int errorOccurred = 0;
 
     signal(SIGQUIT, handle_sigquit);
 
@@ -328,7 +329,8 @@ int main(int argc, char *argv[])
                 if (success == -1)
                 {
                     fprintf(stderr, "%d: %s: command not found\n", i + 1, commando);
-                    // exit(EXIT_FAILURE);
+                    errorOccurred=1;
+                    exit(EXIT_FAILURE);
                 }
                 exit(EXIT_SUCCESS);
             }
@@ -349,6 +351,11 @@ int main(int argc, char *argv[])
         {
             background = 0;
         }
+        if (errorOccurred)
+        {
+            break;
+        }
+
     }
 
     return 0;
