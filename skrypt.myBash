@@ -1,9 +1,11 @@
-#!/home/marbur/Documents/Notatki/SO/bash/myBash/main
+#!/home/student/myBash/myBash
 ls | grep o >> asd
 ls >> asd2
-sdgsdg
-sdggfsdg
-sdg
 sleep 7
 rm asd asd2
+sleep 2&
+touch nowy.txt
+sleep 2
+pkill -SIGQUIT myBash
+sleep 2
 
